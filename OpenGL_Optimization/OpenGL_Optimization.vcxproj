@@ -92,7 +92,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>GLEW_STATIC;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>src\vendor;$(SolutionDir)Dependencies;$(SolutionDir)Dependencies\GLM;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\GLFW\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;src\vendor;$(SolutionDir)Dependencies;$(SolutionDir)Dependencies\GLM;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\GLFW\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -109,7 +109,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>GLEW_STATIC;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>src\vendor;$(SolutionDir)Dependencies;$(SolutionDir)Dependencies\GLM;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\GLFW\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;src\vendor;$(SolutionDir)Dependencies;$(SolutionDir)Dependencies\GLM;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\GLFW\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -153,9 +153,12 @@
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\CubeObject.cpp" />
+    <ClCompile Include="src\GLMUtils.cpp" />
     <ClCompile Include="src\IndexBuffer.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
+    <ClCompile Include="src\scenes\SceneCameraWithCube.cpp" />
     <ClCompile Include="src\scenes\SceneClearColor.cpp" />
+    <ClCompile Include="src\scenes\SceneMenu.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\vendor\imgui\imgui.cpp" />
@@ -169,10 +172,13 @@
     <ClCompile Include="src\VertexBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\GLMUtils.h" />
     <ClInclude Include="src\IndexBuffer.h" />
     <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\scenes\Scene.h" />
+    <ClInclude Include="src\scenes\SceneCameraWithCube.h" />
     <ClInclude Include="src\scenes\SceneClearColor.h" />
+    <ClInclude Include="src\scenes\SceneMenu.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\vendor\imgui\imconfig.h" />
