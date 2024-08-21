@@ -13,6 +13,9 @@ scene::CameraWithCube::CameraWithCube()
 	glfwSetCursorPosCallback(m_Window, [](GLFWwindow* window, double xpos, double ypos) {
 		CameraWithCube* scene = static_cast<CameraWithCube*>(glfwGetWindowUserPointer(window));
 		scene->OnCursorPos(xpos, ypos);
+
+		ImGuiIO& io = ImGui::GetIO();
+		io.AddMousePosEvent((float)xpos, (float)ypos);
 	});
 
 	float vertices[] = {
@@ -195,34 +198,26 @@ void scene::CameraWithCube::OnRender()
 
 void scene::CameraWithCube::OnImGuiRender()
 {
-	//ImGui_ImplOpenGL3_NewFrame();
-	//ImGui_ImplGlfw_NewFrame();
-	//ImGui::NewFrame();
+	{
+		static float f = 0.0f;
+		static int counter = 0;
 
-	//{
-	//	static float f = 0.0f;
-	//	static int counter = 0;
+		ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
 
-	//	ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+		ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
+		ImGui::Checkbox("Another Window", &show_another_window);
 
-	//	ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-	//	ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-	//	ImGui::Checkbox("Another Window", &show_another_window);
+		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
 
-	//	ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-	//	ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+		if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+			counter++;
+		ImGui::SameLine();
+		ImGui::Text("counter = %d", counter);
 
-	//	if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-	//		counter++;
-	//	ImGui::SameLine();
-	//	ImGui::Text("counter = %d", counter);
-
-	//	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-	//	ImGui::End();
-
-	//	ImGui::Render();
-	//	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-	//}
+		// ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+		ImGui::End();
+	}
 }
 
 void scene::CameraWithCube::processInput(GLFWwindow* window)
@@ -313,9 +308,11 @@ void scene::CameraWithCube::SetMouseMode(MouseMode mode) {
 	{
 	case CAMERA:
 		glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		m_ImGuiIO.WantCaptureMouse = false;
 		break;
 	case CURSOR:
 		glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		m_ImGuiIO.WantCaptureMouse = true;
 		break;
 	default:
 		break;

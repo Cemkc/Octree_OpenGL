@@ -13,9 +13,9 @@
 #include "Renderer.h"
 #include "Texture.h"
 
-//#include <imgui/imgui.h>
-//#include <imgui/imgui_impl_glfw.h>
-//#include <imgui/imgui_impl_opengl3.h>
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_glfw.h>
+#include <imgui/imgui_impl_opengl3.h>
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -41,8 +41,6 @@ namespace scene {
 		Texture texture2;
 
 		Renderer m_Renderer;
-
-		// ImGuiIO& io;
 
 		bool show_demo_window = true;
 		bool show_another_window = false;
@@ -88,6 +86,8 @@ namespace scene {
 		void SetMouseMode(MouseMode mode);
 
 	public:
+		ImGuiIO& m_ImGuiIO = ImGui::GetIO();
+
 		CameraWithCube();
 		~CameraWithCube();
 
