@@ -21,6 +21,8 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
+#include "GameObject.h"
+
 #include "GLMUtils.h"
 
 enum MouseMode {
@@ -34,17 +36,21 @@ namespace scene {
 		VertexArray* m_VAO;
 		VertexBuffer* m_VertexBuffer;
 		VertexBufferLayout* m_Bufferlayout;
-
 		Shader* m_Shader;
 
 		Texture texture1;
 		Texture texture2;
+
+		// std::vector<Camera*> m_cameras;
+		std::vector<GameObject*> m_GameObjects;
 
 		Renderer m_Renderer;
 
 		bool show_demo_window = true;
 		bool show_another_window = false;
 		// ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
+		ImGuiIO& m_ImGuiIO;
 
 		GLFWwindow* m_Window;
 		bool upKey = false;
@@ -60,7 +66,6 @@ namespace scene {
 		bool escapeKeySwitchLow = false;
 
 		// camera
-		glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 		glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, 1.0f);
 		glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
@@ -78,6 +83,7 @@ namespace scene {
 		bool firstMouse = true;
 
 		float weight = 0.0f;
+		glm::mat4 m_IdentityMat = glm::mat4(1.0f);
 		glm::mat4 view = glm::mat4(1.0f);
 		glm::mat4 model = glm::mat4(1.0f);
 
@@ -86,7 +92,7 @@ namespace scene {
 		void SetMouseMode(MouseMode mode);
 
 	public:
-		ImGuiIO& m_ImGuiIO = ImGui::GetIO();
+		static glm::vec3 cameraPos;
 
 		CameraWithCube();
 		~CameraWithCube();

@@ -2,11 +2,10 @@
 
 scene::CameraWithCube::CameraWithCube()
 	:
+	m_ImGuiIO(ImGui::GetIO()),
 	texture1(Texture("res/textures/container.jpg")),
 	texture2(Texture("res/textures/awesomeface.png"))
 {
-	//glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	//glfwSetCursorPosCallback(m_Window, mouse_callback);
 
 	m_Window = glfwGetCurrentContext();
 	glfwSetWindowUserPointer(m_Window, this);
@@ -16,7 +15,7 @@ scene::CameraWithCube::CameraWithCube()
 
 		ImGuiIO& io = ImGui::GetIO();
 		io.AddMousePosEvent((float)xpos, (float)ypos);
-	});
+	});	
 
 	float vertices[] = {
 		-0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
@@ -75,6 +74,8 @@ scene::CameraWithCube::CameraWithCube()
 
 	SetMouseMode(MouseMode::CAMERA);
 
+	CameraWithCube::cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+
 	m_VAO = new VertexArray();
 	m_VertexBuffer =  new VertexBuffer(vertices, 36, 5 * 36 * sizeof(float));
 	m_Bufferlayout = new VertexBufferLayout();
@@ -87,6 +88,40 @@ scene::CameraWithCube::CameraWithCube()
 	m_Shader->AttachShader(GL_VERTEX_SHADER, "res/shaders/vertexShader.glsl");
 	m_Shader->AttachShader(GL_FRAGMENT_SHADER, "res/shaders/fragmentShader.glsl");
 	m_Shader->CreateLinkProgram();
+
+	float margin = 3.0f;
+	float xpos = 0;
+	float ypos = 0;
+
+	unsigned int numberOfObjects = 18;
+
+	for (int i = 0; i < numberOfObjects; i++) {
+		m_GameObjects.push_back(new GameObject);
+		m_GameObjects[i]->VAO = m_VAO;
+		m_GameObjects[i]->Shader = m_Shader;
+	}
+
+	unsigned int rows = static_cast<unsigned int>(std::floor(std::sqrt(numberOfObjects)));
+	unsigned int cols = rows;
+	unsigned int remainder = numberOfObjects - (rows * cols);
+
+	if (remainder > 0) rows += 1;
+
+	unsigned int objectIndex = 0;
+	for (int i = 0; i < rows; i++) {
+		for (int j = 0; j < cols; j++) {
+			if (objectIndex >= numberOfObjects) break;
+
+			float x = i * margin;
+			float z = j * margin;
+
+			glm::vec3 position(x, 0.0f, z);
+
+			m_GameObjects[objectIndex]->transform.position = position;
+
+			objectIndex++;
+		}
+	}
 
 	m_Shader->Bind(); // don't forget to activate/use the shader before setting uniforms!
 
@@ -113,6 +148,10 @@ scene::CameraWithCube::~CameraWithCube()
 
 void scene::CameraWithCube::OnUpdate(float deltaTime)
 {
+
+	for (GameObject* gameObject : m_GameObjects) {
+		gameObject->Update();
+	}
 }
 
 void scene::CameraWithCube::OnRender()
@@ -158,7 +197,7 @@ void scene::CameraWithCube::OnRender()
 	}
 
 	glm::vec3 cameraTarget;
-	cameraTarget = cameraPos + cameraFront;
+	cameraTarget = CameraWithCube::cameraPos + cameraFront;
 	glm::vec3 direction;
 	direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
 	direction.y = sin(glm::radians(pitch));
@@ -168,25 +207,18 @@ void scene::CameraWithCube::OnRender()
 	glm::vec3 worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
 	glm::vec3 cameraRight = glm::cross(worldUp, cameraFront);
 	glm::vec3 cameraUp = glm::cross(cameraFront, cameraRight);
-	view = glm::lookAt(cameraPos, cameraTarget, cameraUp);
-
-	if (debugKeySwitchHigh) {
-		std::cout << "Camera Position: \n" << printVector3(cameraPos);
-		std::cout << "Camera Right: \n" << printVector3(cameraRight);
-		std::cout << "Camera Up: \n" << printVector3(cameraUp);
-		std::cout << "View: \n" << printMatrix(view);
-	}
+	view = glm::lookAt(CameraWithCube::cameraPos, cameraTarget, cameraUp);
 
 	if (escapeKeySwitchHigh) {
 		if (m_MouseMode == MouseMode::CAMERA) SetMouseMode(MouseMode::CURSOR);
 		else if (m_MouseMode == MouseMode::CURSOR) SetMouseMode(MouseMode::CAMERA);
 	}
 
-	m_Shader->setUniformMat4("model", model);
 	m_Shader->setUniformMat4("view", view);
 
-	m_Renderer.DrawArrays(*m_VAO, *m_Shader);
-	// glDrawArrays(GL_TRIANGLES, 0, 36);
+	for (GameObject* gameObject : m_GameObjects) {
+		m_Renderer.DrawGameObject(*gameObject);
+	}
 
 	debugKeySwitchHigh = false;
 	debugKeySwitchLow = false;
@@ -225,13 +257,13 @@ void scene::CameraWithCube::processInput(GLFWwindow* window)
 
 	float cameraSpeed = static_cast<float>(2.5 * deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		cameraPos += cameraSpeed * cameraFront;
+		CameraWithCube::cameraPos += cameraSpeed * cameraFront;
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		cameraPos -= cameraSpeed * cameraFront;
+		CameraWithCube::cameraPos -= cameraSpeed * cameraFront;
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+		CameraWithCube::cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+		CameraWithCube::cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 
 
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -308,11 +340,11 @@ void scene::CameraWithCube::SetMouseMode(MouseMode mode) {
 	{
 	case CAMERA:
 		glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-		m_ImGuiIO.WantCaptureMouse = false;
+		ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouse;
 		break;
 	case CURSOR:
 		glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-		m_ImGuiIO.WantCaptureMouse = true;
+		ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_NoMouse;
 		break;
 	default:
 		break;
