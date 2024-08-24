@@ -203,14 +203,18 @@
     <ClInclude Include="src\OpenGL\VertexBufferLayout.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\shaders\fragmentShader.glsl" />
-    <None Include="res\shaders\vertexShader.glsl" />
+    <None Include="res\shaders\color_shader\fragmentShader.glsl" />
+    <None Include="res\shaders\color_shader\vertexShader.glsl" />
+    <None Include="res\shaders\texture_shader\fragmentShader.glsl" />
+    <None Include="res\shaders\texture_shader\vertexShader.glsl" />
     <None Include="src\Shaders\fragmentShader.glsl" />
     <None Include="src\Shaders\vertexShader.glsl" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="C:\Users\cemko\Desktop\SquareGimp.png" />
     <Image Include="res\textures\awesomeface.png" />
     <Image Include="res\textures\container.jpg" />
+    <Image Include="res\textures\square_gimp.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

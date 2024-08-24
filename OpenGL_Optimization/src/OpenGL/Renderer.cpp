@@ -21,8 +21,9 @@ void Renderer::DrawGameObject(const GameObject& go)
 	}
 
 	m_Model = glm::translate(m_Model, go.transform.position);
-	// m_Model = glm::scale(m_Model, go.transform.position);
+	m_Model = glm::scale(m_Model, go.transform.scale);
 	m_Shader->setUniformMat4("model", m_Model);
+	m_Shader->SetUniform4f("color", go.color);
 
 	GLCall(glDrawArrays(GL_TRIANGLES, 0, go.VAO->GetVertexCount()));
 

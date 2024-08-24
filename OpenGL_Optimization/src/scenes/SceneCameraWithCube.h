@@ -39,7 +39,6 @@ namespace scene {
 		Shader* m_Shader;
 
 		Texture texture1;
-		Texture texture2;
 
 		// std::vector<Camera*> m_cameras;
 		std::vector<GameObject*> m_GameObjects;

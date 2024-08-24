@@ -7,6 +7,7 @@
 class GameObject {
 public:
 	Transform transform;
+	glm::vec4 color;
 	VertexArray* VAO = nullptr;
 	Shader* Shader = nullptr;
 

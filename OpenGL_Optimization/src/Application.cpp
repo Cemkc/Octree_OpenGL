@@ -1,6 +1,7 @@
 #pragma once
 // #include <stdio.h>
 #include <iostream>
+#include <chrono>
 #include <unordered_map>
 
 #include <GL/glew.h>
@@ -92,6 +93,8 @@ int main()
 	glfwMakeContextCurrent(mainWindow);
 	glfwSetFramebufferSizeCallback(mainWindow, framebuffer_size_callback);
 
+	glfwSwapInterval(0);
+
 	// Allow modern extension features
 	glewExperimental = GL_TRUE;
 
@@ -106,66 +109,88 @@ int main()
 	// Setup viewport size
 	glViewport(0, 0, bufferWidth, bufferHeight);
 
+	
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGui::StyleColorsDark();
+
+	ImGui_ImplGlfw_InitForOpenGL(mainWindow, true);
+	ImGui_ImplOpenGL3_Init("#version 330");
+
+	Scene* currentScene = nullptr;
+	SceneMenu* sceneMenu = new SceneMenu(currentScene);
+	currentScene = sceneMenu;
+
+	sceneMenu->RegisterScene<SceneClearColor>("Clear Color");
+	sceneMenu->RegisterScene<CameraWithCube>("Camera With Cube");
+
+	std::chrono::high_resolution_clock::time_point startTime = std::chrono::high_resolution_clock::now();
+	int frameCount = 0;
+	float fps = 0.0f;
+
+	
+
+	while (!glfwWindowShouldClose(mainWindow))
 	{
-		glEnable(GL_DEPTH_TEST);
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
 
-		IMGUI_CHECKVERSION();
-		ImGui::CreateContext();
-		ImGui::StyleColorsDark();
+		if (currentScene) {
+			currentScene->OnUpdate(0.0f);
+			currentScene->OnRender();
 
-		ImGui_ImplGlfw_InitForOpenGL(mainWindow, true);
-		ImGui_ImplOpenGL3_Init("#version 330");
+			ImGui::Begin("Scene");
 
-		Scene* currentScene = nullptr;
-		SceneMenu* sceneMenu = new SceneMenu(currentScene);
-		currentScene = sceneMenu;
-
-		sceneMenu->RegisterScene<SceneClearColor>("Clear Color");
-		sceneMenu->RegisterScene<CameraWithCube>("Camera With Cube");
-
-		while (!glfwWindowShouldClose(mainWindow))
-		{
-			ImGui_ImplOpenGL3_NewFrame();
-			ImGui_ImplGlfw_NewFrame();
-			ImGui::NewFrame();
-
-			if (currentScene) {
-				currentScene->OnUpdate(0.0f);
-				currentScene->OnRender();
-
-				ImGui::Begin("Scene");
-
-				if (currentScene != sceneMenu && ImGui::Button("<-")) {
-					delete currentScene;
-					currentScene = sceneMenu;
-				}
-				currentScene->OnImGuiRender();
-
-				ImGui::End();
+			if (currentScene != sceneMenu && ImGui::Button("<-")) {
+				delete currentScene;
+				currentScene = sceneMenu;
 			}
 
-			ImGui::Render();
-			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+			ImGui::Text("Frame Rate: %.0f\n", fps);
 
-			// Get + Hanlde user input events
-			glfwPollEvents();
-			glfwSwapBuffers(mainWindow);
+			currentScene->OnImGuiRender();
+
+			ImGui::End();
 		}
 
-		if (currentScene != sceneMenu) {
-			delete currentScene;
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+		// Increment frame count
+		frameCount++;
+
+		// Calculate time since last update
+		std::chrono::high_resolution_clock::time_point currentTime = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<float> elapsedTime = currentTime - startTime;
+
+		if (elapsedTime.count() >= 1.0f) { // Every second
+			fps = frameCount / elapsedTime.count();
+			frameCount = 0;
+			startTime = currentTime;
 		}
-		delete sceneMenu;
 
-		ImGui_ImplOpenGL3_Shutdown();
-		ImGui_ImplGlfw_Shutdown();
-		ImGui::DestroyContext();
-		
-		glfwTerminate();
-
+		// Get + Hanlde user input events
+		glfwPollEvents();
+		glfwSwapBuffers(mainWindow);
 	}
+
+	if (currentScene != sceneMenu) {
+		delete currentScene;
+	}
+	delete sceneMenu;
+
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
+		
+	glfwTerminate();
+
+	
 
 	return 0;
 }

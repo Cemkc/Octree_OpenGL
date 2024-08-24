@@ -3,8 +3,7 @@
 scene::CameraWithCube::CameraWithCube()
 	:
 	m_ImGuiIO(ImGui::GetIO()),
-	texture1(Texture("res/textures/container.jpg")),
-	texture2(Texture("res/textures/awesomeface.png"))
+	texture1(Texture("res/textures/square_gimp.png"))
 {
 
 	m_Window = glfwGetCurrentContext();
@@ -85,20 +84,21 @@ scene::CameraWithCube::CameraWithCube()
 
 	m_Shader = new Shader();
 
-	m_Shader->AttachShader(GL_VERTEX_SHADER, "res/shaders/vertexShader.glsl");
-	m_Shader->AttachShader(GL_FRAGMENT_SHADER, "res/shaders/fragmentShader.glsl");
+	m_Shader->AttachShader(GL_VERTEX_SHADER, "res/shaders/color_shader/vertexShader.glsl");
+	m_Shader->AttachShader(GL_FRAGMENT_SHADER, "res/shaders/color_shader/fragmentShader.glsl");
 	m_Shader->CreateLinkProgram();
 
 	float margin = 3.0f;
 	float xpos = 0;
 	float ypos = 0;
 
-	unsigned int numberOfObjects = 18;
+	unsigned int numberOfObjects = 16;
 
 	for (int i = 0; i < numberOfObjects; i++) {
 		m_GameObjects.push_back(new GameObject);
 		m_GameObjects[i]->VAO = m_VAO;
 		m_GameObjects[i]->Shader = m_Shader;
+		m_GameObjects[i]->transform.scale = glm::vec4(0.5f, 0.5f, 0.5f, 1.0f);
 	}
 
 	unsigned int rows = static_cast<unsigned int>(std::floor(std::sqrt(numberOfObjects)));
@@ -126,7 +126,6 @@ scene::CameraWithCube::CameraWithCube()
 	m_Shader->Bind(); // don't forget to activate/use the shader before setting uniforms!
 
 	m_Shader->setUniform1i("texture1", 0);
-	m_Shader->setUniform1i("texture2", 1);
 
 	glm::mat4 model(1.0f);
 	glm::mat4 view(1.0f);
@@ -181,20 +180,19 @@ void scene::CameraWithCube::OnRender()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	texture1.Bind(0);
-	texture2.Bind(1);
 
-	if (upKey) {
-		weight = weight + 0.002f;
-		if (weight < 0.0f) weight = 0.0f;
-		else if (weight > 1.0f) weight = 1.0f;
-		m_Shader->setUniform1f("weight", weight);
-	}
-	if (downKey) {
-		weight = weight - 0.002f;
-		if (weight < 0.0f) weight = 0.0f;
-		else if (weight > 1.0f) weight = 1.0f;
-		m_Shader->setUniform1f("weight", weight);
-	}
+	//if (upKey) {
+	//	weight = weight + 0.002f;
+	//	if (weight < 0.0f) weight = 0.0f;
+	//	else if (weight > 1.0f) weight = 1.0f;
+	//	m_Shader->setUniform1f("weight", weight);
+	//}
+	//if (downKey) {
+	//	weight = weight - 0.002f;
+	//	if (weight < 0.0f) weight = 0.0f;
+	//	else if (weight > 1.0f) weight = 1.0f;
+	//	m_Shader->setUniform1f("weight", weight);
+	//}
 
 	glm::vec3 cameraTarget;
 	cameraTarget = CameraWithCube::cameraPos + cameraFront;
