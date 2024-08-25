@@ -5,7 +5,7 @@
 glm::vec3 scene::CameraWithCube::cameraPos;
 
 GameObject::GameObject()
-	: color(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f))
+	: color(glm::vec4(1.0f, 1.0f, 0.0f, 1.0f))
 {
 }
 
@@ -17,9 +17,6 @@ void GameObject::Update()
 {
 	if (glm::length(scene::CameraWithCube::cameraPos - transform.position) < 1.5f) {
 		color = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
-	}
-	else {
-		color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
 	}
 
 	double sum = 0.0;

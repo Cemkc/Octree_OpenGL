@@ -87,12 +87,15 @@ scene::CameraWithCube::CameraWithCube()
 	m_Shader->AttachShader(GL_VERTEX_SHADER, "res/shaders/color_shader/vertexShader.glsl");
 	m_Shader->AttachShader(GL_FRAGMENT_SHADER, "res/shaders/color_shader/fragmentShader.glsl");
 	m_Shader->CreateLinkProgram();
+	
+	BoundingBox boundary = { glm::vec3(5.0f, 0.0f, 5.0f), glm::vec3(50.0f) };
+	m_Octree = new Octree<GameObject>(boundary, 10);
 
 	float margin = 3.0f;
 	float xpos = 0;
 	float ypos = 0;
 
-	unsigned int numberOfObjects = 16;
+	unsigned int numberOfObjects = 100;
 
 	for (int i = 0; i < numberOfObjects; i++) {
 		m_GameObjects.push_back(new GameObject);
@@ -119,6 +122,8 @@ scene::CameraWithCube::CameraWithCube()
 
 			m_GameObjects[objectIndex]->transform.position = position;
 
+			m_Octree->Insert(m_GameObjects[objectIndex], m_GameObjects[objectIndex]->transform.position);
+
 			objectIndex++;
 		}
 	}
@@ -143,12 +148,19 @@ scene::CameraWithCube::~CameraWithCube()
 	delete m_VertexBuffer;
 	delete m_Bufferlayout;
 	delete m_Shader;
+	delete m_Octree;
 }
 
 void scene::CameraWithCube::OnUpdate(float deltaTime)
 {
+	// std::vector<GameObject*> nearbyObjects = m_Octree->GetObjectsInPoint(cameraPos);
 
 	for (GameObject* gameObject : m_GameObjects) {
+		gameObject->color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+	}
+
+	for (GameObject* gameObject : m_GameObjects) {
+		gameObject->color = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
 		gameObject->Update();
 	}
 }

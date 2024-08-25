@@ -22,6 +22,7 @@
 #include "glm/gtc/type_ptr.hpp"
 
 #include "GameObject.h"
+#include "Octree.h"
 
 #include "GLMUtils.h"
 
@@ -33,6 +34,7 @@ enum MouseMode {
 namespace scene {
 	class CameraWithCube : public Scene {
 	private:
+		Renderer m_Renderer;
 		VertexArray* m_VAO;
 		VertexBuffer* m_VertexBuffer;
 		VertexBufferLayout* m_Bufferlayout;
@@ -42,8 +44,8 @@ namespace scene {
 
 		// std::vector<Camera*> m_cameras;
 		std::vector<GameObject*> m_GameObjects;
-
-		Renderer m_Renderer;
+		Octree<GameObject>* m_Octree;
+		BoundingBox* m_Bounds;
 
 		bool show_demo_window = true;
 		bool show_another_window = false;

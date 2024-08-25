@@ -156,6 +156,7 @@
     <ClCompile Include="src\CubeObject.cpp" />
     <ClCompile Include="src\GameObject.cpp" />
     <ClCompile Include="src\GLMUtils.cpp" />
+    <ClCompile Include="src\Octree.cpp" />
     <ClCompile Include="src\OpenGL\IndexBuffer.cpp" />
     <ClCompile Include="src\OpenGL\Renderer.cpp" />
     <ClCompile Include="src\scenes\SceneCameraWithCube.cpp" />
@@ -178,6 +179,7 @@
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\GameObject.h" />
     <ClInclude Include="src\GLMUtils.h" />
+    <ClInclude Include="src\Octree.h" />
     <ClInclude Include="src\OpenGL\ExceptionHandling.h" />
     <ClInclude Include="src\OpenGL\IndexBuffer.h" />
     <ClInclude Include="src\OpenGL\Renderer.h" />
