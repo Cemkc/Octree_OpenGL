@@ -90,7 +90,7 @@ int main()
 	SceneMenu* sceneMenu = new SceneMenu(currentScene);
 	currentScene = sceneMenu;
 
-	sceneMenu->RegisterScene<CameraWithCube>("Camera With Cube");
+	sceneMenu->RegisterScene<CameraWithCube>("Demo Scene");
 
 	std::chrono::high_resolution_clock::time_point startTime = std::chrono::high_resolution_clock::now();
 	int frameCount = 0;
@@ -149,7 +149,11 @@ int main()
 						spawnMethodButtonText = "##";
 					}
 				}
+
+				ImGui::Spacing();
 			}
+
+			ImGui::Text("Start Scene: ");
 
 			if (currentScene != sceneMenu && ImGui::Button("<-")) {
 				delete currentScene;

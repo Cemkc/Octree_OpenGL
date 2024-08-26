@@ -13,8 +13,6 @@ namespace scene {
 		template <typename T>
 		void RegisterScene(const std::string& sceneName)
 		{
-			std::cout << "Registering Scene: " << sceneName << std::endl;
-
 			m_Scenes.push_back(std::make_pair(sceneName, []() {return new T; }));
 		}
 

@@ -75,9 +75,6 @@
     <ClCompile Include="src\Octree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\scenes\SceneOctreeDemo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\CommonData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -134,9 +131,6 @@
     <ClInclude Include="src\scenes\Scene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\scenes\SceneClearColor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\GLMUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -156,9 +150,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Octree.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\scenes\SceneOctreeDemo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\CommonData.h">

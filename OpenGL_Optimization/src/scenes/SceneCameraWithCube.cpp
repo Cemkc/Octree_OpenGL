@@ -208,8 +208,9 @@ void scene::CameraWithCube::OnImGuiRender()
 		ImGui::Text("Mouse Sensitivity");
 		ImGui::SameLine();
 		ImGui::SliderFloat("##", &sensitivity, 0.0f, 1.0f);
+		ImGui::Text("Current Algorithm: %s", CommonData::AlgorithmMethodToString().c_str());
+		ImGui::Spacing();
 		ImGui::Text("Frame Rate: %.0f\n", CommonData::FrameRate);
-		ImGui::Text(CommonData::InitMethodToString().c_str());
 
 		ImGui::End();
 	}
