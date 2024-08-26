@@ -40,6 +40,8 @@ User can run the scene after they are satisfied with their configurations by cli
 Each instantiated object besides of being rendered, run thier `Update()` methods. The `Update()` method checks if the camera is at a certain distance to the calling object and if it is, sets the color of the object to blue.</br>
 `Update()` method contains the following code:
 ```c++
+void GameObject::Update()
+{
 	if (glm::length(scene::CameraWithCube::cameraPos - transform.position) < 1.5f) {
 		color = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
 	}
@@ -48,6 +50,8 @@ Each instantiated object besides of being rendered, run thier `Update()` methods
 	for (int i = 0; i < 10000; ++i) {
 		sum += sqrt(i * 0.001);
 	}
+
+}
 ```
 Along with the distance check logic, each object runs a for loop that performs a square root operation. This is done so that the performance bottleneck is caused by the CPU rather than GPU.
 
