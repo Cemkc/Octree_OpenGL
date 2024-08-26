@@ -178,7 +178,7 @@
     <Image Include="C:\Users\cemko\Desktop\SquareGimp.png">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="res\textures\square_gimp.png">
+    <Image Include="res\textures\square_frame.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

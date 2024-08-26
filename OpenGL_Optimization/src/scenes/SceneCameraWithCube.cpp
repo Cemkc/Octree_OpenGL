@@ -3,7 +3,7 @@
 scene::CameraWithCube::CameraWithCube()
 	:
 	m_ImGuiIO(ImGui::GetIO()),
-	texture1(Texture("res/textures/square_gimp.png"))
+	texture1(Texture("res/textures/square_frame.png"))
 {
 
 	m_Window = glfwGetCurrentContext();
@@ -91,41 +91,50 @@ scene::CameraWithCube::CameraWithCube()
 	BoundingBox boundary = { glm::vec3(5.0f, 0.0f, 5.0f), glm::vec3(50.0f) };
 	m_Octree = new Octree<GameObject>(boundary, 10);
 
-	float margin = 3.0f;
-	float xpos = 0;
-	float ypos = 0;
+	//float margin = 3.0f;
+	//float xpos = 0;
+	//float ypos = 0;
 
-	unsigned int numberOfObjects = 100;
+	//unsigned int numberOfObjects = 1000;
 
-	for (int i = 0; i < numberOfObjects; i++) {
+	//for (int i = 0; i < numberOfObjects; i++) {
+	//	m_GameObjects.push_back(new GameObject);
+	//	m_GameObjects[i]->VAO = m_VAO;
+	//	m_GameObjects[i]->Shader = m_Shader;
+	//	m_GameObjects[i]->transform.scale = glm::vec4(0.5f, 0.5f, 0.5f, 1.0f);
+	//}
+
+	//unsigned int rows = static_cast<unsigned int>(std::floor(std::sqrt(numberOfObjects)));
+	//unsigned int cols = rows;
+	//unsigned int remainder = numberOfObjects - (rows * cols);
+
+	//if (remainder > 0) rows += 1;
+
+	//unsigned int objectIndex = 0;
+	//for (int i = 0; i < rows; i++) {
+	//	for (int j = 0; j < cols; j++) {
+	//		if (objectIndex >= numberOfObjects) break;
+
+	//		float x = i * margin;
+	//		float z = j * margin;
+
+	//		glm::vec3 position(x, 0.0f, z);
+
+	//		m_GameObjects[objectIndex]->transform.position = position;
+
+	//		m_Octree->Insert(m_GameObjects[objectIndex], m_GameObjects[objectIndex]->transform.position);
+
+	//		objectIndex++;
+	//	}
+	//}
+
+	for (int i = 0; i < 1000; ++i) {
 		m_GameObjects.push_back(new GameObject);
 		m_GameObjects[i]->VAO = m_VAO;
 		m_GameObjects[i]->Shader = m_Shader;
 		m_GameObjects[i]->transform.scale = glm::vec4(0.5f, 0.5f, 0.5f, 1.0f);
-	}
-
-	unsigned int rows = static_cast<unsigned int>(std::floor(std::sqrt(numberOfObjects)));
-	unsigned int cols = rows;
-	unsigned int remainder = numberOfObjects - (rows * cols);
-
-	if (remainder > 0) rows += 1;
-
-	unsigned int objectIndex = 0;
-	for (int i = 0; i < rows; i++) {
-		for (int j = 0; j < cols; j++) {
-			if (objectIndex >= numberOfObjects) break;
-
-			float x = i * margin;
-			float z = j * margin;
-
-			glm::vec3 position(x, 0.0f, z);
-
-			m_GameObjects[objectIndex]->transform.position = position;
-
-			m_Octree->Insert(m_GameObjects[objectIndex], m_GameObjects[objectIndex]->transform.position);
-
-			objectIndex++;
-		}
+		m_GameObjects[i]->transform.position = glm::vec3(rand() % 60 - 30, rand() % 20 - 10, rand() % 60 - 30);
+		m_Octree->Insert(m_GameObjects[i], m_GameObjects[i]->transform.position);
 	}
 
 	m_Shader->Bind(); // don't forget to activate/use the shader before setting uniforms!
@@ -153,13 +162,13 @@ scene::CameraWithCube::~CameraWithCube()
 
 void scene::CameraWithCube::OnUpdate(float deltaTime)
 {
-	// std::vector<GameObject*> nearbyObjects = m_Octree->GetObjectsInPoint(cameraPos);
+	std::vector<GameObject*> nearbyObjects = m_Octree->GetObjectsInPoint(cameraPos);
 
 	for (GameObject* gameObject : m_GameObjects) {
 		gameObject->color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
 	}
 
-	for (GameObject* gameObject : m_GameObjects) {
+	for (GameObject* gameObject : nearbyObjects) {
 		gameObject->color = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
 		gameObject->Update();
 	}
@@ -244,13 +253,15 @@ void scene::CameraWithCube::OnImGuiRender()
 		static float f = 0.0f;
 		static int counter = 0;
 
-		ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+		ImGui::Begin("Config");
 
-		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-		ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
+		ImGui::Text("This is some useful text.");
+		ImGui::Checkbox("Demo Window", &show_demo_window);
 		ImGui::Checkbox("Another Window", &show_another_window);
 
-		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+		ImGui::Text("Mouse Sensitivity");
+		ImGui::SameLine();
+		ImGui::SliderFloat("##", &sensitivity, 0.0f, 1.0f);            
 
 		if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
 			counter++;
@@ -264,8 +275,11 @@ void scene::CameraWithCube::OnImGuiRender()
 
 void scene::CameraWithCube::processInput(GLFWwindow* window)
 {
-
-	float cameraSpeed = static_cast<float>(2.5 * deltaTime);
+	float cameraSpeed;
+	if((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS))
+		cameraSpeed = static_cast<float>(5 * deltaTime);
+	else
+		cameraSpeed = static_cast<float>(2.5 * deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		CameraWithCube::cameraPos += cameraSpeed * cameraFront;
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -274,7 +288,10 @@ void scene::CameraWithCube::processInput(GLFWwindow* window)
 		CameraWithCube::cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		CameraWithCube::cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-
+	if(glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+		CameraWithCube::cameraPos += cameraUp * cameraSpeed;
+	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+		CameraWithCube::cameraPos -= cameraUp * cameraSpeed;
 
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 	{
@@ -329,7 +346,6 @@ void scene::CameraWithCube::OnCursorPos(double xpos, double ypos)
 	float yoffset = mouseLastY - ypos; // reversed: y ranges bottom to top
 	mouseLastX = xpos;
 	mouseLastY = ypos;
-	const float sensitivity = 0.1f;
 	xoffset *= sensitivity;
 	yoffset *= sensitivity;
 

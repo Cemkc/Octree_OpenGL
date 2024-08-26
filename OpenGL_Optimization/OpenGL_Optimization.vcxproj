@@ -216,7 +216,7 @@
     <Image Include="C:\Users\cemko\Desktop\SquareGimp.png" />
     <Image Include="res\textures\awesomeface.png" />
     <Image Include="res\textures\container.jpg" />
-    <Image Include="res\textures\square_gimp.png" />
+    <Image Include="res\textures\square_frame.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

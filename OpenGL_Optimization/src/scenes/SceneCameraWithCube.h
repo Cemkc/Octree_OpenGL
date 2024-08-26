@@ -73,7 +73,7 @@ namespace scene {
 		float yaw = glm::radians(90.0f); // Horizontal angle, start at 90 degrees
 		float pitch = glm::radians(90.0f);   // Vertical angle, start at 90 degrees
 		const float radius = 1.0f;        // Distance from the target point
-		float sensitivity = 0.02f;         // Movement sensitivity
+		float sensitivity = 0.1f;         // Movement sensitivity
 
 		// Timing 
 		float deltaTime = 0.0f; // Time before current frame and last frame
