@@ -26,6 +26,8 @@
 
 #include "GLMUtils.h"
 
+#include "CommonData.h"
+
 enum MouseMode {
 	CAMERA,
 	CURSOR
@@ -83,10 +85,12 @@ namespace scene {
 		float mouseLastX = 400, mouseLastY = 300;
 		bool firstMouse = true;
 
-		float weight = 0.0f;
 		glm::mat4 m_IdentityMat = glm::mat4(1.0f);
 		glm::mat4 view = glm::mat4(1.0f);
 		glm::mat4 model = glm::mat4(1.0f);
+
+		void GridInit();
+		void RandomInit();
 
 		void processInput(GLFWwindow* window);
 		void OnCursorPos(double xpos, double ypos);
@@ -98,36 +102,10 @@ namespace scene {
 		CameraWithCube();
 		~CameraWithCube();
 
-		void OnUpdate(float deltaTime) override;
-		void OnRender() override;
-		void OnImGuiRender() override;
+		virtual void OnUpdate(float deltaTime) override;
+		virtual void OnRender() override;
+		virtual void OnImGuiRender() override;
 
 		void InitWindow(GLFWwindow* window) { m_Window = window; }
-
-		void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
-			if (firstMouse) // initially set to true
-			{
-				mouseLastX = (float)xpos;
-				mouseLastY = (float)ypos;
-				firstMouse = false;
-			}
-
-			float xoffset = xpos - mouseLastX;
-			float yoffset = mouseLastY - ypos; // reversed: y ranges bottom to top
-			mouseLastX = xpos;
-			mouseLastY = ypos;
-			const float sensitivity = 0.1f;
-			xoffset *= sensitivity;
-			yoffset *= sensitivity;
-
-			yaw += xoffset;
-			pitch += yoffset;
-
-			if (pitch > 89.0f)
-				pitch = 89.0f;
-			if (pitch < -89.0f)
-				pitch = -89.0f;
-
-		}
 	};
 }

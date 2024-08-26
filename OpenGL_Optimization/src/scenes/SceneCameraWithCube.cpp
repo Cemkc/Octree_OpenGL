@@ -73,7 +73,7 @@ scene::CameraWithCube::CameraWithCube()
 
 	SetMouseMode(MouseMode::CAMERA);
 
-	CameraWithCube::cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+	CameraWithCube::cameraPos = glm::vec3(-3.0f, 0.0f, 0.0f);
 
 	m_VAO = new VertexArray();
 	m_VertexBuffer =  new VertexBuffer(vertices, 36, 5 * 36 * sizeof(float));
@@ -88,54 +88,13 @@ scene::CameraWithCube::CameraWithCube()
 	m_Shader->AttachShader(GL_FRAGMENT_SHADER, "res/shaders/color_shader/fragmentShader.glsl");
 	m_Shader->CreateLinkProgram();
 	
-	BoundingBox boundary = { glm::vec3(5.0f, 0.0f, 5.0f), glm::vec3(50.0f) };
-	m_Octree = new Octree<GameObject>(boundary, 10);
-
-	//float margin = 3.0f;
-	//float xpos = 0;
-	//float ypos = 0;
-
-	//unsigned int numberOfObjects = 1000;
-
-	//for (int i = 0; i < numberOfObjects; i++) {
-	//	m_GameObjects.push_back(new GameObject);
-	//	m_GameObjects[i]->VAO = m_VAO;
-	//	m_GameObjects[i]->Shader = m_Shader;
-	//	m_GameObjects[i]->transform.scale = glm::vec4(0.5f, 0.5f, 0.5f, 1.0f);
-	//}
-
-	//unsigned int rows = static_cast<unsigned int>(std::floor(std::sqrt(numberOfObjects)));
-	//unsigned int cols = rows;
-	//unsigned int remainder = numberOfObjects - (rows * cols);
-
-	//if (remainder > 0) rows += 1;
-
-	//unsigned int objectIndex = 0;
-	//for (int i = 0; i < rows; i++) {
-	//	for (int j = 0; j < cols; j++) {
-	//		if (objectIndex >= numberOfObjects) break;
-
-	//		float x = i * margin;
-	//		float z = j * margin;
-
-	//		glm::vec3 position(x, 0.0f, z);
-
-	//		m_GameObjects[objectIndex]->transform.position = position;
-
-	//		m_Octree->Insert(m_GameObjects[objectIndex], m_GameObjects[objectIndex]->transform.position);
-
-	//		objectIndex++;
-	//	}
-	//}
-
-	for (int i = 0; i < 1000; ++i) {
-		m_GameObjects.push_back(new GameObject);
-		m_GameObjects[i]->VAO = m_VAO;
-		m_GameObjects[i]->Shader = m_Shader;
-		m_GameObjects[i]->transform.scale = glm::vec4(0.5f, 0.5f, 0.5f, 1.0f);
-		m_GameObjects[i]->transform.position = glm::vec3(rand() % 60 - 30, rand() % 20 - 10, rand() % 60 - 30);
-		m_Octree->Insert(m_GameObjects[i], m_GameObjects[i]->transform.position);
+	if (CommonData::AlgoMethod == CommonData::AlgorithmMethod::OCTREE) {
+		BoundingBox boundary = { glm::vec3(5.0f, 0.0f, 5.0f), glm::vec3(50.0f) };
+		m_Octree = new Octree<GameObject>(boundary, 10);
 	}
+
+	if (CommonData::InitMethod == CommonData::InitializationMethod::GRID) GridInit();
+	else RandomInit();
 
 	m_Shader->Bind(); // don't forget to activate/use the shader before setting uniforms!
 
@@ -145,9 +104,6 @@ scene::CameraWithCube::CameraWithCube()
 	glm::mat4 view(1.0f);
 	glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
 	m_Shader->setUniformMat4("projection", projection);
-
-	float weight = 0;
-	m_Shader->setUniform1f("weight", weight);
 	
 }
 
@@ -162,15 +118,22 @@ scene::CameraWithCube::~CameraWithCube()
 
 void scene::CameraWithCube::OnUpdate(float deltaTime)
 {
-	std::vector<GameObject*> nearbyObjects = m_Octree->GetObjectsInPoint(cameraPos);
-
 	for (GameObject* gameObject : m_GameObjects) {
 		gameObject->color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
 	}
 
-	for (GameObject* gameObject : nearbyObjects) {
-		gameObject->color = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
-		gameObject->Update();
+	if (CommonData::AlgoMethod == CommonData::AlgorithmMethod::OCTREE) {
+		std::vector<GameObject*> nearbyObjects = m_Octree->GetObjectsInPoint(cameraPos);
+		for (GameObject* gameObject : nearbyObjects) {
+			gameObject->color = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
+			gameObject->Update();
+		}
+	}
+	else {
+		for (GameObject* gameObject : m_GameObjects) {
+			gameObject->color = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
+			gameObject->Update();
+		}
 	}
 }
 
@@ -201,19 +164,6 @@ void scene::CameraWithCube::OnRender()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	texture1.Bind(0);
-
-	//if (upKey) {
-	//	weight = weight + 0.002f;
-	//	if (weight < 0.0f) weight = 0.0f;
-	//	else if (weight > 1.0f) weight = 1.0f;
-	//	m_Shader->setUniform1f("weight", weight);
-	//}
-	//if (downKey) {
-	//	weight = weight - 0.002f;
-	//	if (weight < 0.0f) weight = 0.0f;
-	//	else if (weight > 1.0f) weight = 1.0f;
-	//	m_Shader->setUniform1f("weight", weight);
-	//}
 
 	glm::vec3 cameraTarget;
 	cameraTarget = CameraWithCube::cameraPos + cameraFront;
@@ -253,25 +203,70 @@ void scene::CameraWithCube::OnImGuiRender()
 		static float f = 0.0f;
 		static int counter = 0;
 
-		ImGui::Begin("Config");
-
-		ImGui::Text("This is some useful text.");
-		ImGui::Checkbox("Demo Window", &show_demo_window);
-		ImGui::Checkbox("Another Window", &show_another_window);
+		ImGui::Begin("Scene");
 
 		ImGui::Text("Mouse Sensitivity");
 		ImGui::SameLine();
-		ImGui::SliderFloat("##", &sensitivity, 0.0f, 1.0f);            
+		ImGui::SliderFloat("##", &sensitivity, 0.0f, 1.0f);
+		ImGui::Text("Frame Rate: %.0f\n", CommonData::FrameRate);
+		ImGui::Text(CommonData::InitMethodToString().c_str());
 
-		if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-			counter++;
-		ImGui::SameLine();
-		ImGui::Text("counter = %d", counter);
-
-		// ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
 		ImGui::End();
 	}
 }
+
+ void scene::CameraWithCube::GridInit() {
+	float margin = 3.0f;
+	float xpos = 0;
+	float ypos = 0;
+
+	unsigned int numberOfObjects = CommonData::CubeNumber;
+
+	for (int i = 0; i < numberOfObjects; i++) {
+		m_GameObjects.push_back(new GameObject);
+		m_GameObjects[i]->VAO = m_VAO;
+		m_GameObjects[i]->Shader = m_Shader;
+		m_GameObjects[i]->transform.scale = glm::vec4(0.5f, 0.5f, 0.5f, 1.0f);
+	}
+
+	unsigned int rows = static_cast<unsigned int>(std::floor(std::sqrt(numberOfObjects)));
+	unsigned int cols = rows;
+	unsigned int remainder = numberOfObjects - (rows * cols);
+
+	if (remainder > 0) rows += 1;
+
+	unsigned int objectIndex = 0;
+	for (int i = 0; i < rows; i++) {
+		for (int j = 0; j < cols; j++) {
+			if (objectIndex >= numberOfObjects) break;
+
+			float x = i * margin;
+			float z = j * margin;
+
+			glm::vec3 position(x, 0.0f, z);
+
+			m_GameObjects[objectIndex]->transform.position = position;
+
+			if(CommonData::AlgoMethod == CommonData::AlgorithmMethod::OCTREE)
+			m_Octree->Insert(m_GameObjects[objectIndex], m_GameObjects[objectIndex]->transform.position);
+
+			objectIndex++;
+		}
+	}
+}
+
+ void scene::CameraWithCube::RandomInit()
+ {
+	 for (int i = 0; i < CommonData::CubeNumber; ++i) {
+		 m_GameObjects.push_back(new GameObject);
+		 m_GameObjects[i]->VAO = m_VAO;
+		 m_GameObjects[i]->Shader = m_Shader;
+		 m_GameObjects[i]->transform.scale = glm::vec4(0.5f, 0.5f, 0.5f, 1.0f);
+		 m_GameObjects[i]->transform.position = glm::vec3(rand() % 60 - 30, rand() % 20 - 10, rand() % 60 - 30);
+		 if(CommonData::AlgoMethod == CommonData::AlgorithmMethod::OCTREE)
+		 m_Octree->Insert(m_GameObjects[i], m_GameObjects[i]->transform.position);
+	 }
+ }
 
 void scene::CameraWithCube::processInput(GLFWwindow* window)
 {

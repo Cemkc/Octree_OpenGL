@@ -152,15 +152,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
-    <ClCompile Include="src\Camera.cpp" />
-    <ClCompile Include="src\CubeObject.cpp" />
+    <ClCompile Include="src\CommonData.cpp" />
     <ClCompile Include="src\GameObject.cpp" />
     <ClCompile Include="src\GLMUtils.cpp" />
     <ClCompile Include="src\Octree.cpp" />
     <ClCompile Include="src\OpenGL\IndexBuffer.cpp" />
     <ClCompile Include="src\OpenGL\Renderer.cpp" />
+    <ClCompile Include="src\scenes\SceneOctreeDemo.cpp" />
     <ClCompile Include="src\scenes\SceneCameraWithCube.cpp" />
-    <ClCompile Include="src\scenes\SceneClearColor.cpp" />
     <ClCompile Include="src\scenes\SceneMenu.cpp" />
     <ClCompile Include="src\OpenGL\Shader.cpp" />
     <ClCompile Include="src\OpenGL\Texture.cpp" />
@@ -176,20 +175,20 @@
     <ClCompile Include="src\OpenGL\VertexBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Camera.h" />
+    <ClInclude Include="src\CommonData.h" />
     <ClInclude Include="src\GameObject.h" />
     <ClInclude Include="src\GLMUtils.h" />
     <ClInclude Include="src\Octree.h" />
     <ClInclude Include="src\OpenGL\ExceptionHandling.h" />
     <ClInclude Include="src\OpenGL\IndexBuffer.h" />
     <ClInclude Include="src\OpenGL\Renderer.h" />
+    <ClInclude Include="src\scenes\SceneOctreeDemo.h" />
     <ClInclude Include="src\scenes\Scene.h" />
     <ClInclude Include="src\scenes\SceneCameraWithCube.h" />
     <ClInclude Include="src\scenes\SceneClearColor.h" />
     <ClInclude Include="src\scenes\SceneMenu.h" />
     <ClInclude Include="src\OpenGL\Shader.h" />
     <ClInclude Include="src\OpenGL\Texture.h" />
-    <ClInclude Include="src\ShowcaseEngine.h" />
     <ClInclude Include="src\Transform.h" />
     <ClInclude Include="src\vendor\imgui\imconfig.h" />
     <ClInclude Include="src\vendor\imgui\imgui.h" />
