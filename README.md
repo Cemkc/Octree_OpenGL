@@ -62,6 +62,6 @@ Each object in the scene can take 3 different collor; red, blue, yellow That ind
 
 When the scene is loaded user can inspect Frame Rate value and current running algorith from the UI menu.</br>
 
-![Scene Menu](/githubAssets/Images/ConfigMenu.png)
+![Scene Menu](/githubAssets/Images/MainSceneMenu.png)
 
 ## Demonstration Video
