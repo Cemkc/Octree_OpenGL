@@ -1,72 +1,66 @@
-# Distance Based Optimization Using Octree
+[![Octree Optimization Showcase](https://img.youtube.com/vi/ZJ1vbPq08L4/maxresdefault.jpg)](https://www.youtube.com/watch?v=ZJ1vbPq08L4)
+*Click the image above to watch the full technical breakdown and demonstration.*
 
-This repository contains the source code for an application aimed to show the optimization methods that can be used to instantiate many objects in a 3D scene without sacrificing signifcant performance.
+## 📌 Project Overview
+This project was engineered to solve a specific, high-level architectural case study: *"How do you optimize distance-checking operations in a densely populated 3D scene?"* To answer this, I developed a custom C++ and OpenGL benchmarking application that visually and mathematically compares brute-force O(n²) spatial queries against an optimized O(log n) **Octree Spatial Partitioning** algorithm. The application allows users to dynamically switch between rendering methods at runtime to observe the massive differences in CPU overhead and framerate stability.
 
-## How to use
+## 🛠️ Tech Stack
+* **Language:** C++
+* **Graphics API:** OpenGL / GLSL
+* **Libraries:** GLFW, GLEW, GLM (Mathematics)
+* **UI:** Dear ImGui
 
-After installing the folder that contains the exe file, run the exe file. 
-Upon launching the application, the user will be presented with a configuration menu. Using this menu, certain settings can be adjusted before the scene is loaded.
+## 🚀 Technical & Optimization Highlights
 
-![Configuration Menu](/githubAssets/Images/ConfigMenu.png)
+### Algorithmic Complexity Reduction (O(n²) vs O(log n))
+In a brute-force scenario, every object in the scene must calculate its distance relative to the camera, resulting in an exponential processing bottleneck as entity counts rise. 
+* By engineering a custom, templated `Octree` data structure, the 3D space is recursively subdivided into 8 bounding boxes.
+* The algorithm eliminates unnecessary distance checks by only evaluating objects residing within the camera's active or adjacent sub-nodes, drastically reducing CPU load.
 
-**Number of objects to spawn**</br>
-Determines how many objects will be spawned to the scene.</br>
-If the algorithm is set to `BRUTE_FORCE` all the objects that are spawned will run their Update() methods. It is recommended to not exceed 5000.
+### Hardware Isolation & Bottleneck Profiling
+To ensure the benchmarking tool was accurately measuring spatial partitioning efficiency rather than GPU rendering limits, I deliberately isolated the CPU. 
+* Injected a heavy mathematical operation (a 10,000-iteration `sqrt` loop) into the `Update()` method of each active game object. 
+* This guaranteed that the performance bottleneck was strictly CPU-bound, providing an accurate, real-world stress test for the Octree algorithm.
 
-**Algorithm To Use**</br>
-When the button is clicked it will switch between `BRUTE_FORCE` and `OCTREE`.
+### Visual Debugging & State Management
+Implemented a real-time color-coding system to visually debug the algorithmic culling:
+* 🔴 **Red:** Object is culled/inactive (bypassing the heavy logic loop).
+* 🟡 **Yellow:** Object is active and evaluating its distance, but outside the threshold.
+* 🔵 **Blue:** Object is active and within the camera's collision radius.
 
-**Object Initialization Method**</br>
-When the button is clicked it will switch between `RANDOM` and `GRID`.</br>
-- `RANDOM` spawns objects randomly withing the boundaries.</br>
-- `GRID` spawns objects on a grid.
+## 💻 Code Architecture: Octree Subdivision
+*The core spatial partitioning logic. When a node exceeds its capacity, it recursively subdivides the 3D space into 8 uniform child bounds and reallocates its contained entities.*
 
-**Start Scene**</br>
-User can run the scene after they are satisfied with their configurations by clicking the "Demo Scene" button.</br>
+```cpp
+void Subdivide() {
+    glm::vec3 newHalfSize = m_Bounds.halfSize / 2.0f;
+    glm::vec3 offset[8] = {
+        glm::vec3(-newHalfSize.x,  newHalfSize.y, -newHalfSize.z),
+        glm::vec3( newHalfSize.x,  newHalfSize.y, -newHalfSize.z),
+        glm::vec3(-newHalfSize.x,  newHalfSize.y,  newHalfSize.z),
+        glm::vec3( newHalfSize.x,  newHalfSize.y,  newHalfSize.z),
+        glm::vec3(-newHalfSize.x, -newHalfSize.y, -newHalfSize.z),
+        glm::vec3( newHalfSize.x, -newHalfSize.y, -newHalfSize.z),
+        glm::vec3(-newHalfSize.x, -newHalfSize.y,  newHalfSize.z),
+        glm::vec3( newHalfSize.x, -newHalfSize.y,  newHalfSize.z)
+    };
 
-## Controls
+    for (int i = 0; i < 8; ++i) {
+        BoundingBox childBox{
+            m_Bounds.center + offset[i],
+            newHalfSize
+        };
+        m_Children[i] = std::make_unique<Octree<T>>(childBox, m_Capacity);
 
-- Mouse to adjust camera rotation (sensitivity can be set from the scene menu).
-- WASD to move the camera on forwards and right directions.
-- E to move the camera on positive up direction.
-- Q to move the camera on negative up direction.
-- LShift to increase the speed of the camera.
-- ESC to Enable cursor and interact with UI.
+        std::vector<OctreeData> objectData;
+        for (int j = 0; j < m_Objects.size(); j++) {
+            if (childBox.containsPoint((m_Objects[j].position))) {
+                objectData.push_back(m_Objects[j]);
+            }
+        }
+        m_Children[i]->m_Objects = objectData;
+    }
 
-## Key Points
-
-### Object Logic
-
-Each instantiated object besides of being rendered, run thier `Update()` methods. The `Update()` method checks if the camera is at a certain distance to the calling object and if it is, sets the color of the object to blue.</br>
-`Update()` method contains the following code:
-```c++
-void GameObject::Update()
-{
-	if (glm::length(scene::CameraWithCube::cameraPos - transform.position) < 1.5f) {
-		color = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
-	}
-
-	double sum = 0.0;
-	for (int i = 0; i < 10000; ++i) {
-		sum += sqrt(i * 0.001);
-	}
-
+    m_Objects.clear();
+    m_Divided = true;
 }
-```
-Along with the distance check logic, each object runs a for loop that performs a square root operation. This is done so that the performance bottleneck is caused by the CPU rather than GPU.
-
-### Color Coding
-
-Each object in the scene can take 3 different collor; red, blue, yellow That indicates behaviour of the object.
-- If the object is red; the object is not running it's logic code.
-- If the object is yellow; the object is running it's logic code.
-- If the object is blue; the object is running it's logic code and Camera is closer than a certain distance to the object.
-
-## How to read
-
-When the scene is loaded user can inspect Frame Rate value and current running algorith from the UI menu.</br>
-
-![Scene Menu](/githubAssets/Images/MainSceneMenu.png)
-
-## Demonstration Video
-https://drive.google.com/file/d/1GcFJQXGEzatAH-9dMcfMUz-PHeUyb55W/view?usp=sharing
